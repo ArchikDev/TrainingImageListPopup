@@ -10,6 +10,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -18,6 +22,7 @@ import com.ar4uk.myapplication.R
 import com.ar4uk.myapplication.domain.model.UnsplashImage
 import com.ar4uk.myapplication.presentation.component.ImageVistaTopAppBar
 import com.ar4uk.myapplication.presentation.component.ImagesVerticalGrid
+import com.ar4uk.myapplication.presentation.component.ZoomedImageCard
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,6 +33,9 @@ fun HomeScreen(
     onSearchClick: () -> Unit,
     onFABClick: () -> Unit
 ) {
+    var showImagePreview by remember { mutableStateOf(false) }
+    var activeImage by remember { mutableStateOf<UnsplashImage?>(null) }
+
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -39,7 +47,12 @@ fun HomeScreen(
             )
             ImagesVerticalGrid(
                 images = images,
-                onImageClick = onImageClick
+                onImageClick = onImageClick,
+                onImageDragStart = { image ->
+                    activeImage = image
+                    showImagePreview = true
+                },
+                onImageDragEnd = { showImagePreview = false }
             )
         }
 
@@ -55,6 +68,12 @@ fun HomeScreen(
                 tint = MaterialTheme.colorScheme.onBackground
             )
         }
+
+        ZoomedImageCard(
+            modifier = Modifier.padding(20.dp),
+            isVisible = showImagePreview,
+            image = activeImage
+        )
 
     }
 }

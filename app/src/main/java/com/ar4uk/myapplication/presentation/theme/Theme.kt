@@ -1,4 +1,4 @@
-package com.ar4uk.myapplication.ui.theme
+package com.ar4uk.myapplication.presentation.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

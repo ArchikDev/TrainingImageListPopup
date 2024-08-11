@@ -1,4 +1,4 @@
-package com.ar4uk.myapplication
+package com.ar4uk.myapplication.presentation
 
 import android.annotation.SuppressLint
 import android.os.Bundle
@@ -11,13 +11,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
-import com.ar4uk.myapplication.presentation.home_screen.HomeScreen
-import com.ar4uk.myapplication.presentation.home_screen.HomeViewModel
 import com.ar4uk.myapplication.presentation.navigation.NavGraphSetup
-import com.ar4uk.myapplication.ui.theme.TrainingImageListPopupTheme
+import com.ar4uk.myapplication.presentation.theme.TrainingImageListPopupTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
     @OptIn(ExperimentalMaterial3Api::class)

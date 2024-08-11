@@ -6,11 +6,16 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ar4uk.myapplication.data.mapper.toDomainModelList
-import com.ar4uk.myapplication.di.AppModule
-import kotlinx.coroutines.launch
 import com.ar4uk.myapplication.domain.model.UnsplashImage
+import com.ar4uk.myapplication.domain.repository.ImageRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel: ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(
+    private val repository: ImageRepository
+): ViewModel() {
 
     var images: List<UnsplashImage> by mutableStateOf(emptyList())
         private set
@@ -21,8 +26,8 @@ class HomeViewModel: ViewModel() {
 
     private fun getImages() {
         viewModelScope.launch {
-            val result = AppModule.retrofitService.getEditorialFeedImages()
-            images = result.toDomainModelList()
+            val result = repository.getEditorialFeedImages()
+            images = result
         }
     }
 }
