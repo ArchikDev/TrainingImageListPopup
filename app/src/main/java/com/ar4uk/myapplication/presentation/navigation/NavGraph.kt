@@ -10,6 +10,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.ar4uk.myapplication.presentation.favorites_screen.FavoritesScreen
 import com.ar4uk.myapplication.presentation.full_image_screen.FullImageScreen
 import com.ar4uk.myapplication.presentation.full_image_screen.FullImageViewModel
@@ -17,13 +18,16 @@ import com.ar4uk.myapplication.presentation.home_screen.HomeScreen
 import com.ar4uk.myapplication.presentation.home_screen.HomeViewModel
 import com.ar4uk.myapplication.presentation.profile_screen.ProfileScreen
 import com.ar4uk.myapplication.presentation.search_screen.SearchScreen
+import com.ar4uk.myapplication.presentation.search_screen.SearchViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavGraphSetup(
     navController: NavHostController,
     scrollBehavior: TopAppBarScrollBehavior,
-    snackbarHostState: SnackbarHostState
+    snackbarHostState: SnackbarHostState,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
 ) {
     NavHost(
         navController = navController,
@@ -44,8 +48,19 @@ fun NavGraphSetup(
             )
         }
         composable<Routes.SearchScreen> {
+            val searchViewModel: SearchViewModel = hiltViewModel()
+            val searchedImages = searchViewModel.searchImages.collectAsLazyPagingItems()
             SearchScreen(
-                onBackClick = { navController.navigateUp() }
+                snackbarHostState = snackbarHostState,
+                snackbarEvent = searchViewModel.snackbarEvent,
+                searchedImages = searchedImages,
+                searchQuery = searchQuery,
+                onSearchQueryChange = onSearchQueryChange,
+                onBackClick = { navController.navigateUp() },
+                onImageClick = { imageId ->
+                    navController.navigate(Routes.FullImageScreen(imageId))
+                },
+                onSearch = { searchViewModel.searchImages(it) }
             )
         }
         composable<Routes.FavoritesScreen> {
