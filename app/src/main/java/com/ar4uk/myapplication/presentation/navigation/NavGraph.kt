@@ -14,6 +14,7 @@ import com.ar4uk.myapplication.presentation.full_image_screen.FullImageScreen
 import com.ar4uk.myapplication.presentation.full_image_screen.FullImageViewModel
 import com.ar4uk.myapplication.presentation.home_screen.HomeScreen
 import com.ar4uk.myapplication.presentation.home_screen.HomeViewModel
+import com.ar4uk.myapplication.presentation.profile_screen.ProfileScreen
 import com.ar4uk.myapplication.presentation.search_screen.SearchScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -53,11 +54,20 @@ fun NavGraphSetup(
             FullImageScreen(
                 image = fullImageViewModel.image,
                 onBackClick = { navController.navigateUp() },
-                onPhotographerImgClick = {}
+                onPhotographerNameClick = {
+                    navController.navigate(Routes.ProfileScreen(it))
+                },
+                onImageDownloadClick = { url, title ->
+                    fullImageViewModel.downloadImage(url, title)
+                }
             )
         }
-        composable<Routes.ProfileScreen> {
-
+        composable<Routes.ProfileScreen> { backStackEntry ->
+            val profileLink = backStackEntry.toRoute<Routes.ProfileScreen>().profileLink
+            ProfileScreen(
+                profileLink = profileLink,
+                onBackClick = { navController.navigateUp() }
+            )
         }
     }
 }

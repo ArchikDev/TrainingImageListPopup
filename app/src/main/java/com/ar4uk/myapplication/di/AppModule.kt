@@ -1,13 +1,17 @@
 package com.ar4uk.myapplication.di
 
+import android.content.Context
 import com.ar4uk.myapplication.data.remote.UnsplashApiService
 import com.ar4uk.myapplication.data.repository.ImageRepositoryImpl
+import com.ar4uk.myapplication.domain.repository.Downloader
 import com.ar4uk.myapplication.domain.repository.ImageRepository
+import com.example.imagevista.data.repository.AndroidImageDownloader
 import com.example.imagevista.data.util.Constants
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -36,5 +40,13 @@ object AppModule {
         apiService: UnsplashApiService
     ): ImageRepository {
         return ImageRepositoryImpl(apiService)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAndroidImageDownloader(
+        @ApplicationContext context: Context
+    ): Downloader {
+        return AndroidImageDownloader(context)
     }
 }
