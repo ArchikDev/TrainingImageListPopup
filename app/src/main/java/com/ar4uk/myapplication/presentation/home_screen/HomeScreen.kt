@@ -8,8 +8,10 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,18 +25,32 @@ import com.ar4uk.myapplication.domain.model.UnsplashImage
 import com.ar4uk.myapplication.presentation.component.ImageVistaTopAppBar
 import com.ar4uk.myapplication.presentation.component.ImagesVerticalGrid
 import com.ar4uk.myapplication.presentation.component.ZoomedImageCard
+import com.ar4uk.myapplication.presentation.util.SnackbarEvent
+import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
+    snackbarHostState: SnackbarHostState,
+    snackbarEvent: Flow<SnackbarEvent>,
     scrollBehavior: TopAppBarScrollBehavior,
     images: List<UnsplashImage>,
     onImageClick: (String) -> Unit,
     onSearchClick: () -> Unit,
-    onFABClick: () -> Unit
+    onFABClick: () -> Unit,
 ) {
+
     var showImagePreview by remember { mutableStateOf(false) }
     var activeImage by remember { mutableStateOf<UnsplashImage?>(null) }
+
+    LaunchedEffect(key1 = true) {
+        snackbarEvent.collect { event ->
+            snackbarHostState.showSnackbar(
+                message = event.message,
+                duration = event.duration
+            )
+        }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -55,7 +71,6 @@ fun HomeScreen(
                 onImageDragEnd = { showImagePreview = false }
             )
         }
-
         FloatingActionButton(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
@@ -68,12 +83,10 @@ fun HomeScreen(
                 tint = MaterialTheme.colorScheme.onBackground
             )
         }
-
         ZoomedImageCard(
             modifier = Modifier.padding(20.dp),
             isVisible = showImagePreview,
             image = activeImage
         )
-
     }
 }

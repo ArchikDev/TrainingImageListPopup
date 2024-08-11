@@ -1,6 +1,7 @@
 package com.ar4uk.myapplication.presentation.navigation
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -21,17 +22,20 @@ import com.ar4uk.myapplication.presentation.search_screen.SearchScreen
 @Composable
 fun NavGraphSetup(
     navController: NavHostController,
-    scrollBehavior: TopAppBarScrollBehavior
+    scrollBehavior: TopAppBarScrollBehavior,
+    snackbarHostState: SnackbarHostState
 ) {
     NavHost(
         navController = navController,
         startDestination = Routes.HomeScreen
     ) {
         composable<Routes.HomeScreen> {
-            val viewModel: HomeViewModel = hiltViewModel()
+            val homeViewModel: HomeViewModel = hiltViewModel()
             HomeScreen(
+                snackbarHostState = snackbarHostState,
+                snackbarEvent = homeViewModel.snackbarEvent,
                 scrollBehavior = scrollBehavior,
-                images = viewModel.images,
+                images = homeViewModel.images,
                 onImageClick = { imageId ->
                     navController.navigate(Routes.FullImageScreen(imageId))
                 },
@@ -49,13 +53,15 @@ fun NavGraphSetup(
                 onBackClick = { navController.navigateUp() }
             )
         }
-        composable<Routes.FullImageScreen> { backStackEntry ->
+        composable<Routes.FullImageScreen> {
             val fullImageViewModel: FullImageViewModel = hiltViewModel()
             FullImageScreen(
+                snackbarHostState = snackbarHostState,
+                snackbarEvent = fullImageViewModel.snackbarEvent,
                 image = fullImageViewModel.image,
                 onBackClick = { navController.navigateUp() },
-                onPhotographerNameClick = {
-                    navController.navigate(Routes.ProfileScreen(it))
+                onPhotographerNameClick = { profileLink ->
+                    navController.navigate(Routes.ProfileScreen(profileLink))
                 },
                 onImageDownloadClick = { url, title ->
                     fullImageViewModel.downloadImage(url, title)

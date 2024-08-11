@@ -19,6 +19,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -47,16 +48,18 @@ import com.ar4uk.myapplication.presentation.component.DownloadOptionsBottomSheet
 import com.ar4uk.myapplication.presentation.component.FullImageViewTopBar
 import com.ar4uk.myapplication.presentation.component.ImageDownloadOption
 import com.ar4uk.myapplication.presentation.component.ImageVistaLoadingBar
+import com.ar4uk.myapplication.presentation.util.SnackbarEvent
 import com.example.imagevista.presentation.util.rememberWindowInsetsController
 import com.example.imagevista.presentation.util.toggleStatusBars
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlin.math.max
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3Api::class
-)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun FullImageScreen(
+    snackbarHostState: SnackbarHostState,
+    snackbarEvent: Flow<SnackbarEvent>,
     image: UnsplashImage?,
     onBackClick: () -> Unit,
     onPhotographerNameClick: (String) -> Unit,
@@ -69,6 +72,15 @@ fun FullImageScreen(
 
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     var isDownloadBottomSheetOpen by remember { mutableStateOf(false) }
+
+    LaunchedEffect(key1 = true) {
+        snackbarEvent.collect { event ->
+            snackbarHostState.showSnackbar(
+                message = event.message,
+                duration = event.duration
+            )
+        }
+    }
 
     LaunchedEffect(key1 = Unit) {
         windowInsetsController.toggleStatusBars(show = showBars)
@@ -87,7 +99,7 @@ fun FullImageScreen(
             scope.launch { sheetState.hide() }.invokeOnCompletion {
                 if (!sheetState.isVisible) isDownloadBottomSheetOpen = false
             }
-            val url = when(option) {
+            val url = when (option) {
                 ImageDownloadOption.SMALL -> image?.imageUrlSmall
                 ImageDownloadOption.MEDIUM -> image?.imageUrlRegular
                 ImageDownloadOption.ORIGINAL -> image?.imageUrlRaw
@@ -135,6 +147,7 @@ fun FullImageScreen(
                 painter = if (isError.not()) imageLoader else painterResource(id = R.drawable.ic_error),
                 contentDescription = null,
                 modifier = Modifier
+                    .fillMaxSize()
                     .transformable(transformState)
                     .combinedClickable(
                         onDoubleClick = {

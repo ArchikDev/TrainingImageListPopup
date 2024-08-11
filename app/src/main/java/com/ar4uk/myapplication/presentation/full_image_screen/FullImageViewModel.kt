@@ -11,8 +11,12 @@ import com.ar4uk.myapplication.domain.model.UnsplashImage
 import com.ar4uk.myapplication.domain.repository.Downloader
 import com.ar4uk.myapplication.domain.repository.ImageRepository
 import com.ar4uk.myapplication.presentation.navigation.Routes
+import com.ar4uk.myapplication.presentation.util.SnackbarEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.net.UnknownHostException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,9 +24,12 @@ class FullImageViewModel @Inject constructor(
     private val repository: ImageRepository,
     private val downloader: Downloader,
     savedStateHandle: SavedStateHandle
-): ViewModel() {
+) : ViewModel() {
 
     private val imageId = savedStateHandle.toRoute<Routes.FullImageScreen>().imageId
+
+    private val _snackbarEvent = Channel<SnackbarEvent>()
+    val snackbarEvent = _snackbarEvent.receiveAsFlow()
 
     var image: UnsplashImage? by mutableStateOf(null)
         private set
@@ -36,8 +43,14 @@ class FullImageViewModel @Inject constructor(
             try {
                 val result = repository.getImage(imageId)
                 image = result
+            } catch (e: UnknownHostException) {
+                _snackbarEvent.send(
+                    SnackbarEvent(message = "No Internet connection. Please check you network.")
+                )
             } catch (e: Exception) {
-                e.printStackTrace()
+                _snackbarEvent.send(
+                    SnackbarEvent(message = "Something went wrong: ${e.message}")
+                )
             }
         }
     }
@@ -47,7 +60,9 @@ class FullImageViewModel @Inject constructor(
             try {
                 downloader.downloadFile(url, title)
             } catch (e: Exception) {
-                e.printStackTrace()
+                _snackbarEvent.send(
+                    SnackbarEvent(message = "Something went wrong: ${e.message}")
+                )
             }
         }
     }
