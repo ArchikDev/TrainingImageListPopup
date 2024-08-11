@@ -8,7 +8,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,7 +22,7 @@ import com.ar4uk.myapplication.presentation.component.ImagesVerticalGrid
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    scrollBehaviour: TopAppBarScrollBehavior,
+    scrollBehavior: TopAppBarScrollBehavior,
     images: List<UnsplashImage>,
     onImageClick: (String) -> Unit,
     onSearchClick: () -> Unit,
@@ -35,7 +34,7 @@ fun HomeScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ImageVistaTopAppBar(
-                scrollBehavior = scrollBehaviour,
+                scrollBehavior = scrollBehavior,
                 onSearchClick = onSearchClick
             )
             ImagesVerticalGrid(
