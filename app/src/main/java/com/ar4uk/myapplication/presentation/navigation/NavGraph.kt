@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.ar4uk.myapplication.presentation.favorites_screen.FavoritesScreen
 import com.ar4uk.myapplication.presentation.full_image_screen.FullImageScreen
+import com.ar4uk.myapplication.presentation.full_image_screen.FullImageViewModel
 import com.ar4uk.myapplication.presentation.home_screen.HomeScreen
 import com.ar4uk.myapplication.presentation.home_screen.HomeViewModel
 import com.ar4uk.myapplication.presentation.search_screen.SearchScreen
@@ -48,10 +49,11 @@ fun NavGraphSetup(
             )
         }
         composable<Routes.FullImageScreen> { backStackEntry ->
-            val imageId = backStackEntry.toRoute<Routes.FullImageScreen>().imageId
+            val fullImageViewModel: FullImageViewModel = hiltViewModel()
             FullImageScreen(
-                imageId = imageId,
-                onBackClick = { navController.navigateUp() }
+                image = fullImageViewModel.image,
+                onBackClick = { navController.navigateUp() },
+                onPhotographerImgClick = {}
             )
         }
         composable<Routes.ProfileScreen> {
