@@ -3,7 +3,7 @@ package com.ar4uk.myapplication.data.remote
 import retrofit2.http.Query
 import com.ar4uk.myapplication.data.remote.dto.UnsplashImageDto
 import com.ar4uk.myapplication.data.remote.dto.UnsplashImagesSearchResult
-import com.example.imagevista.data.util.Constants.API_KEY
+import com.ar4uk.myapplication.data.util.Constants.API_KEY
 import retrofit2.http.GET
 import retrofit2.http.Headers
 import retrofit2.http.Path

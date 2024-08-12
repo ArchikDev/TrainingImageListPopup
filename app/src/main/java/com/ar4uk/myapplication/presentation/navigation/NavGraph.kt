@@ -4,7 +4,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -12,6 +14,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ar4uk.myapplication.presentation.favorites_screen.FavoritesScreen
+import com.ar4uk.myapplication.presentation.favorites_screen.FavoritesViewModel
 import com.ar4uk.myapplication.presentation.full_image_screen.FullImageScreen
 import com.ar4uk.myapplication.presentation.full_image_screen.FullImageViewModel
 import com.ar4uk.myapplication.presentation.home_screen.HomeScreen
@@ -50,22 +53,38 @@ fun NavGraphSetup(
         composable<Routes.SearchScreen> {
             val searchViewModel: SearchViewModel = hiltViewModel()
             val searchedImages = searchViewModel.searchImages.collectAsLazyPagingItems()
+            val favoriteImageIds by searchViewModel.favoriteImageIds.collectAsStateWithLifecycle()
             SearchScreen(
                 snackbarHostState = snackbarHostState,
                 snackbarEvent = searchViewModel.snackbarEvent,
                 searchedImages = searchedImages,
+                favoriteImageIds = favoriteImageIds,
                 searchQuery = searchQuery,
                 onSearchQueryChange = onSearchQueryChange,
                 onBackClick = { navController.navigateUp() },
                 onImageClick = { imageId ->
                     navController.navigate(Routes.FullImageScreen(imageId))
                 },
-                onSearch = { searchViewModel.searchImages(it) }
+                onSearch = { searchViewModel.searchImages(it) },
+                onToggleFavoriteStatus = { searchViewModel.toggleFavoriteStatus(it) }
             )
         }
         composable<Routes.FavoritesScreen> {
+            val favoritesViewModel: FavoritesViewModel = hiltViewModel()
+            val favoriteImages = favoritesViewModel.favoriteImages.collectAsLazyPagingItems()
+            val favoriteImageIds by favoritesViewModel.favoriteImageIds.collectAsStateWithLifecycle()
             FavoritesScreen(
-                onBackClick = { navController.navigateUp() }
+                snackbarHostState = snackbarHostState,
+                favoriteImages = favoriteImages,
+                snackbarEvent = favoritesViewModel.snackbarEvent,
+                scrollBehavior = scrollBehavior,
+                onSearchClick = { navController.navigate(Routes.SearchScreen) },
+                favoriteImageIds = favoriteImageIds,
+                onBackClick = { navController.navigateUp() },
+                onImageClick = { imageId ->
+                    navController.navigate(Routes.FullImageScreen(imageId))
+                },
+                onToggleFavoriteStatus = { favoritesViewModel.toggleFavoriteStatus(it) }
             )
         }
         composable<Routes.FullImageScreen> {

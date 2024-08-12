@@ -1,14 +1,17 @@
 package com.ar4uk.myapplication.di
 
 import android.content.Context
+import androidx.room.Room
 import com.ar4uk.myapplication.data.remote.UnsplashApiService
 import com.ar4uk.myapplication.data.repository.ImageRepositoryImpl
 import com.ar4uk.myapplication.domain.repository.Downloader
 import com.ar4uk.myapplication.domain.repository.ImageRepository
 import com.ar4uk.myapplication.domain.repository.NetworkConnectivityObserver
+import com.example.imagevista.data.local.ImageVistaDatabase
 import com.example.imagevista.data.repository.AndroidImageDownloader
 import com.example.imagevista.data.repository.NetworkConnectivityObserverImpl
-import com.example.imagevista.data.util.Constants
+import com.ar4uk.myapplication.data.util.Constants
+import com.ar4uk.myapplication.data.util.Constants.IMAGE_VISTA_DATABASE
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -27,6 +30,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
+
     @Provides
     @Singleton
     fun provideUnsplashApiService(): UnsplashApiService {
@@ -41,10 +45,25 @@ object AppModule {
 
     @Provides
     @Singleton
+    fun provideImageVistaDatabase(
+        @ApplicationContext context: Context
+    ): ImageVistaDatabase {
+        return Room
+            .databaseBuilder(
+                context,
+                ImageVistaDatabase::class.java,
+                IMAGE_VISTA_DATABASE
+            )
+            .build()
+    }
+
+    @Provides
+    @Singleton
     fun provideImageRepository(
-        apiService: UnsplashApiService
+        apiService: UnsplashApiService,
+        database: ImageVistaDatabase
     ): ImageRepository {
-        return ImageRepositoryImpl(apiService)
+        return ImageRepositoryImpl(apiService, database)
     }
 
     @Provides
